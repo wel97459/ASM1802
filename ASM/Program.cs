@@ -38,12 +38,15 @@ namespace ASM
                     {
                         asm.getOutputVHDL();
                     }
-                    
+                    if (args[1].ToLower() == "mem")
+                    {
+                        asm.getOutputMem();
+                    }
                 } else asm.getOutputBin();
 
             } else
             {
-                Console.WriteLine("ASM <Input File> <bin\\hex\\cof\\vhdl>");
+                Console.WriteLine("ASM <Input File> <bin\\hex\\cof\\vhdl\\mem>");
             }
         }
     }

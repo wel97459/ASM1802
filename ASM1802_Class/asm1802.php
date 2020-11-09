@@ -21,7 +21,7 @@
     foreach($Contents as $key=>$val)
     {
       if(strpos($val, ":")>-1 && !(strpos($val, "\"")>-1)){
-		//echo str_chop($val,"",":"). ": ".fix_zero(dechex($PC),4)."\r\n";
+		echoLog (str_chop($val,"",":"). ": ".fix_zero(dechex($PC),4)."\r\n");
         $asm1802_Calls[str_chop($val,"",":")] = $PC;
         $val = "";
       } elseif (strpos($val, "#define")>-1) {
@@ -39,11 +39,11 @@
         $tpc =  call_user_func("asm1802_func_". $Split1[0], $vals, $key+1, $val);
 		$PC += $tpc;
       }
-	  //if(strlen($Output[count($Output)-1])<32){
-	  //  echoLog ("$temp:\t" . $Output[count($Output)-1] . "\t\t\t$val\t$tpc\r\n\r\n");
-     // }else{
-	//	echoLog ("$temp:\tlong...\t\t\t$val\t$tpc\r\n\r\n");  
-	  //}
+	  if(strlen($Output[count($Output)-1])<32){
+	    echoLog ("$temp:\t" . $Output[count($Output)-1] . "\t\t\t$val\t$tpc\r\n\r\n");
+      }else{
+	    echoLog ("$temp:\tlong...\t\t\t$val\t$tpc\r\n\r\n");  
+	  }
       if($val!="") $str[] = $val;
     }
     $Contents = $str;
@@ -157,8 +157,16 @@ function asm1802_save_as_cof($out) {
 
 }
 
+function asm1802_save_as_mem($out){
+    global $name;
+    $fout = "@00000000\n";
+    for($i=0;$i<strlen($out)/2;$i++) $fout .= substr($out,$i*2,2) . "\n";
+    write_file($fout,"$name.mem");
+}
+
 function asm1802_save_as_hex($out){
     global $name;
+
     for($i=0;$i<strlen($out)/2;$i++) $fout .= substr($out,$i*2,2) . " ";
     write_file($fout,"$name.hex");
 }
@@ -812,6 +820,19 @@ function asm1802_save_as_bin($out){
     return (strlen($out)/2);
   }
 
+  function asm1802_func_dbaddr($vals, $line, $val)
+  {
+    global $Output;
+
+	$out="";
+
+	$out .= $vals[0];
+	$out .= $vals[1];
+
+    $Output[] = strtoupper($out);
+    return 2;
+  }
+
   function asm1802_func_dbstr($vals, $line, $val)
   {
     global $Output;
@@ -824,6 +845,22 @@ function asm1802_save_as_bin($out){
 		$out .= fix_zero(dechex(ord(substr($t, $i, 1))));
 	}
 	$out .= "00";
+	$Output[] = strtoupper($out);
+    return (strlen($out)/2);
+  }
+
+  function asm1802_func_dbstrnt($vals, $line, $val)
+  {
+    global $Output;
+
+	$t = str_chop($val,"dbstrnt \"","\"");
+	$out="";
+
+	for($i=0;$i<strlen($t);$i++)
+	{
+		$out .= fix_zero(dechex(ord(substr($t, $i, 1))));
+	}
+
 	$Output[] = strtoupper($out);
     return (strlen($out)/2);
   }

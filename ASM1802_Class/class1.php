@@ -57,4 +57,9 @@ class ASM1802
 		global $Output;
 		asm1802_save_as_vhd($Output);
 	}
+	
+	function getOutputMem(){
+		global $Output;
+		asm1802_save_as_mem($Output);
+	}
 }
